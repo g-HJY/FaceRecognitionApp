@@ -1,0 +1,19 @@
+Executable : F:\Android\sdk\ndk\android-ndk-r17\ndk-build.cmd
+arguments : 
+NDK_PROJECT_PATH=null
+APP_BUILD_SCRIPT=F:\my_old_project\FaceRecognitionApp-1.2.3\app\src\main\cpp\Android.mk
+NDK_APPLICATION_MK=F:\my_old_project\FaceRecognitionApp-1.2.3\app\src\main\cpp\Application.mk
+APP_ABI=x86_64
+NDK_ALL_ABIS=x86_64
+NDK_DEBUG=1
+APP_PLATFORM=android-16
+NDK_OUT=F:/my_old_project/FaceRecognitionApp-1.2.3/app/build/intermediates/ndkBuild/debug/obj
+NDK_LIBS_OUT=F:\my_old_project\FaceRecognitionApp-1.2.3\app\build\intermediates\ndkBuild\debug\lib
+NDK_DEBUG=1
+NDEBUG=null
+APP_SHORT_COMMANDS=false
+LOCAL_SHORT_COMMANDS=false
+-B
+-n
+jvmArgs : 
+

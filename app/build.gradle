@@ -1,0 +1,86 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId 'com.lauszus.facerecognitionapp'
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 6
+        versionName '1.2.3'
+        vectorDrawables.useSupportLibrary = true
+        ndk {
+            stl 'c++_static'
+            cFlags '-std=gnu++11 -fexceptions -frtti -DANDROID_STL=c++_static'
+        }
+        setProperty('archivesBaseName', rootProject.name + '-' + defaultConfig.versionName)
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            universalApk true
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+    project.ext.abiCodes = ['armeabi-v7a':1, 'arm64-v8a':2, 'x86':3, 'x86_64':4]
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def baseAbiVersionCode = project.ext.abiCodes.get(output.getFilter(com.android.build.OutputFile.ABI))
+            // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
+            // the following code does not override the version code for universal APKs.
+            if (baseAbiVersionCode != null) {
+                output.versionCodeOverride = baseAbiVersionCode * 1000000 + variant.versionCode
+            }
+        }
+        if (variant.getBuildType().isMinifyEnabled()) {
+            variant.assemble.doLast {
+                variant.mappingFile.renameTo(variant.mappingFile.parent +
+                        "/$archivesBaseName-$variant.baseName-mapping.txt")
+            }
+        }
+    }
+    signingConfigs {
+        release
+    }
+    buildTypes {
+        debug {
+            jniDebuggable true
+            externalNativeBuild {
+                ndkBuild {
+                    arguments 'NDK_DEBUG=1', 'NDEBUG=null'
+                }
+            }
+        }
+        release {
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation project(':opencv')
+}
+
+// These values are all set in my global gradle.properties file
+if (project.hasProperty('storeFile') && project.hasProperty('storePassword') && project.hasProperty('keyAlias') && project.hasProperty('keyPassword')) {
+    android.signingConfigs.release.storeFile = file(storeFile)
+    android.signingConfigs.release.storePassword = storePassword
+    android.signingConfigs.release.keyAlias = keyAlias
+    android.signingConfigs.release.keyPassword = keyPassword
+} else {
+    android.buildTypes.release.signingConfig = null
+}
